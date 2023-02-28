@@ -46,6 +46,7 @@ userRouter.post("/login", async (req, res) => {
     const user = await UserModel.findOne({ email: email });
 
     if (!user) {
+      console.log();
       return res.status(404).json({ msg: "Email ou senha inválidos" });
     }
 
@@ -70,7 +71,7 @@ userRouter.post("/login", async (req, res) => {
   }
 });
 
-userRouter.put("/", isAuth, attachCurrentUser, isAdmin, async (req, res) => {
+userRouter.put("/", isAuth, attachCurrentUser, async (req, res) => {
   try {
     const updatedUser = await UserModel.findOneAndUpdate(
       { _id: req.currentUser._id },
