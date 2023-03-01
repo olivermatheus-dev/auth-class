@@ -5,11 +5,13 @@ import attachCurrentUser from "../middlewares/attachCurrentUser.js";
 import isAuth from "../middlewares/isAuth.js";
 import { UserModel } from "../models/user.model.js";
 
-const userRouter = express.Router();
+//o index.js está redirecionando as rotas para arquivos como esse dependendo do path da req. Dai, chegando aqui conseguimos trabalhar as rotas.
+const userRouter = express.Router(); //instanciando o express.Router em uma variável
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 10; //camadas de encriptação, quanto mais, mais tempo parar gerar e para conferir
 
-userRouter.post("/signup", async (req, res) => {
+//rota de cadastro de user
+userRouter.post("/sign-up", async (req, res) => {
   try {
     const { password } = req.body;
 
@@ -41,10 +43,13 @@ userRouter.post("/signup", async (req, res) => {
 
 userRouter.post("/login", async (req, res) => {
   try {
+    //desestruturando email e password de req.body
     const { email, password } = req.body;
 
+    //procurando o email que o front enviou no body por alguma correspondência no nosso banco de dados
     const user = await UserModel.findOne({ email: email });
 
+    //abaixo verificando se encontramos um user com o e-mail no sistema
     if (!user) {
       console.log();
       return res.status(404).json({ msg: "Email ou senha inválidos" });
