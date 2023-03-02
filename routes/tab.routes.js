@@ -21,6 +21,7 @@ function categoryCheck(category) {
 //create abaixo
 tabRouter.post("/create", isAuth, attachCurrentUser, async (req, res) => {
   try {
+    //verificar a integridade do formato das informações que estão chegando no req.body
     categoryCheck(req.body.category);
     const tab = await TabModel.create({
       ...req.body,
@@ -75,18 +76,46 @@ tabRouter.put("/update", isAuth, attachCurrentUser, async (req, res) => {
   try {
     const tab = await TabModel.findById(req.body._id);
     if (toString(tab.authorId) === toString(req.currentUser._id)) {
-      return res.status(201).json("Deu certo irmão");
+      const tabUpdated = await TabModel.findOneAndUpdate(
+        { _id: req.body._id },
+        { ...req.body },
+        { new: true, runValidators: true }
+      );
+      return res.status(200).json(tabUpdated);
     }
-    return res.status(200).json("Deu errado irmão");
+    return res
+      .status(404)
+      .json("Você não tem permissão para fazer isso, irmão!");
   } catch (err) {
     console.log(err);
     return res.status(404).json("Deu erro no update irmão");
   }
 });
 
-tabRouter.delete("/delete", isAuth, attachCurrentUser, async (req, res) => {
-  try {
-  } catch {}
-});
+tabRouter.delete(
+  "/delete/:tabId",
+  isAuth,
+  attachCurrentUser,
+  async (req, res) => {
+    try {
+      const tab = await TabModel.findById(req.params.tabId);
+      const user = req.currentUser;
+      if (toString(tab.authorId) === toString(req.currentUser._id)) {
+        const tab = await TabModel.findByIdAndDelete(req.params.tabId);
+        //tirando do author abaixo
+        await UserModel.findByIdAndUpdate(tab.authorId, {
+          $pull: { tabsId: req.params.tabId },
+        });
+        return res.status(200).json("Deletado com sucesso");
+      }
+      return res
+        .status(200)
+        .json("Você não tem permissão para fazer isso, irmão!");
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json("Algo deu errado, irmão!");
+    }
+  }
+);
 
 export { tabRouter };
