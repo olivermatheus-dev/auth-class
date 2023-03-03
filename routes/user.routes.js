@@ -4,6 +4,8 @@ import { generateToken } from "../config/jwt.config.js";
 import attachCurrentUser from "../middlewares/attachCurrentUser.js";
 import isAuth from "../middlewares/isAuth.js";
 import { UserModel } from "../models/user.model.js";
+import { TabModel } from "../models/tab.model.js";
+import { CommentModel } from "../models/comment.model.js";
 
 //o index.js está redirecionando as rotas para arquivos como esse dependendo do path da req. Dai, chegando aqui conseguimos trabalhar as rotas.
 const userRouter = express.Router(); //instanciando o express.Router em uma variável
@@ -92,5 +94,26 @@ userRouter.put("/", isAuth, attachCurrentUser, async (req, res) => {
     return res.status(500).json(err);
   }
 });
+
+userRouter.delete(
+  "/delete/:userId",
+  isAuth,
+  attachCurrentUser,
+  async (req, res) => {
+    try {
+      const user = req.currentUser;
+      if (toString(req.params.userId) === toString(req.currentUser._id)) {
+        await TabModel.deleteMany({ authorId: user._id });
+        await CommentModel.deleteMany({ authorId: user._id });
+        await UserModel.findByIdAndDelete(user._id);
+        return res.status(200).json("User deleted");
+      }
+      return res.status(400).json("Você não tem autorização para isso!");
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+  }
+);
 
 export { userRouter };

@@ -3,6 +3,7 @@ import attachCurrentUser from "../middlewares/attachCurrentUser.js";
 import isAuth from "../middlewares/isAuth.js";
 import { UserModel } from "../models/user.model.js";
 import { TabModel } from "../models/tab.model.js";
+import { CommentModel } from "../models/comment.model.js";
 
 const tabRouter = express.Router();
 
@@ -106,6 +107,8 @@ tabRouter.delete(
         await UserModel.findByIdAndUpdate(tab.authorId, {
           $pull: { tabsId: req.params.tabId },
         });
+        await CommentModel.deleteMany({ tabId: tab._id });
+
         return res.status(200).json("Deletado com sucesso");
       }
       return res
