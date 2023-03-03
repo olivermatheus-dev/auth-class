@@ -12,9 +12,8 @@ const userSchema = new Schema(
     },
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ["ADMIN", "USER"], default: "USER" }, //enum significa que pode ser um ou outro o valor
-
     tabsId: [{ type: Schema.Types.ObjectId, ref: "Tab" }],
-    commentsId: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+    // commentsId: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     // tabsLiked: [{ type: Schema.Types.ObjectId, ref: "Tab" }],
     tabsFavorited: [{ type: Schema.Types.ObjectId, ref: "Tab" }],
     following: [{ type: Schema.Types.ObjectId, ref: "User" }], //adicionado recentemente

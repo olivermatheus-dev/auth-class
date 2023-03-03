@@ -28,11 +28,11 @@ commentRouter.post(
         { new: true, runValidators: true }
       );
 
-      await UserModel.findOneAndUpdate(
-        { _id: user._id },
-        { $push: { commentsId: comment._id } },
-        { new: true, runValidators: true }
-      );
+      //   await UserModel.findOneAndUpdate(
+      //     { _id: user._id },
+      //     { $push: { commentsId: comment._id } },
+      //     { new: true, runValidators: true }
+      //   );
 
       return res.status(200).json("Comment criado com sucesso");
     } catch (err) {
@@ -60,9 +60,9 @@ commentRouter.delete(
         });
 
         //tirando de dentro do user
-        await UserModel.findByIdAndUpdate(comment.authorId, {
-          $pull: { commentsId: req.params.commentId },
-        });
+        // await UserModel.findByIdAndUpdate(comment.authorId, {
+        //   $pull: { commentsId: req.params.commentId },
+        // });
 
         return res.status(200).json("Deletado com sucesso");
       }

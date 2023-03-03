@@ -105,7 +105,14 @@ userRouter.delete(
       if (toString(req.params.userId) === toString(req.currentUser._id)) {
         await TabModel.deleteMany({ authorId: user._id });
         await CommentModel.deleteMany({ authorId: user._id });
+        //
+        await UserModel.updateMany(
+          { $or: [{ follower: user._id }, { following: user._id }] },
+          { $pull: { follower: user._id, following: user._id } }
+        );
+        //
         await UserModel.findByIdAndDelete(user._id);
+
         return res.status(200).json("User deleted");
       }
       return res.status(400).json("Você não tem autorização para isso!");
