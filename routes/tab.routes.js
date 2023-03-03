@@ -73,13 +73,13 @@ tabRouter.get("/details/:tabId", async (req, res) => {
   }
 });
 
-tabRouter.put("/update", isAuth, attachCurrentUser, async (req, res) => {
+tabRouter.put("/update/:tabId", isAuth, attachCurrentUser, async (req, res) => {
   try {
-    const tab = await TabModel.findById(req.body._id);
+    const tab = await TabModel.findById(req.params.tabId);
     if (toString(tab.authorId) === toString(req.currentUser._id)) {
       const tabUpdated = await TabModel.findOneAndUpdate(
-        { _id: req.body._id },
-        { ...req.body },
+        { _id: req.params.tabId },
+        { tab, ...req.body },
         { new: true, runValidators: true }
       );
       return res.status(200).json(tabUpdated);
@@ -108,7 +108,7 @@ tabRouter.delete(
           $pull: { tabsId: req.params.tabId },
         });
         await CommentModel.deleteMany({ tabId: tab._id });
-
+        await UserModel.deleteMany({ tabId: tab._id });
         return res.status(200).json("Deletado com sucesso");
       }
       return res
